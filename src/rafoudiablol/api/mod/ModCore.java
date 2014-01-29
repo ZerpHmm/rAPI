@@ -2,7 +2,6 @@ package rafoudiablol.api.mod;
 
 import rafoudiablol.api.BaseForgeMod;
 import rafoudiablol.api.RApi;
-import rafoudiablol.api.enchantment.EnchantmentAPI;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -17,8 +16,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 )
 public class ModCore extends BaseForgeMod
 {
-	private final EnchantmentAPI enchantmentCore = new EnchantmentAPI();
-	
 	@SidedProxy(
 		clientSide = "rafoudiablol.api.mod.client.ClientProxy",
 		serverSide = "rafoudiablol.api.mod.Proxy"

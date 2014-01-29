@@ -10,12 +10,12 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 /**
 <code>
-	@EventHandler
+	@EventHandler @Override
 	public void preInit(FMLPreInitializationEvent event) {
 		super.preInit(proxy);
 	}
 	
-	@EventHandler
+	@EventHandler @Override
 	public void load(FMLInitializationEvent event) {
 		super.load(proxy);
 	}
