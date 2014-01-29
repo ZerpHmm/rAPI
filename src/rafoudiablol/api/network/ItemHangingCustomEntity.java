@@ -62,15 +62,15 @@ public class ItemHangingCustomEntity extends Item
             {
                 if (entityhanging != null && entityhanging.onValidSurface())
                 {
-            		this.preSpawn(world, entityplayer, i, j, k, entityhanging);
-            		
+                	this.preSpawn(world, entityplayer, i, j, k, entityhanging);
+                	
                     if (!world.isRemote)
                     {
                 		world.spawnEntityInWorld(entityhanging);
                 		
                     }
                     
-            		this.postSpawn(world, entityplayer, i, j, k, entityhanging);
+                    this.postSpawn(world, entityplayer, i, j, k, entityhanging);
 
                     --itemstack.stackSize;
                 }
@@ -89,30 +89,30 @@ public class ItemHangingCustomEntity extends Item
     private EntityHanging createHangingEntity(World world, int i, int j, int k, int l)
     {
     	try
-    	{
+		{
 			return (EntityHanging)hangingEntityClass
 				.getConstructor(World.class, int.class, int.class, int.class, int.class)
 					.newInstance(world, i, j, k, l);
 		}
-    	catch (InstantiationException e) {
-    		e.printStackTrace();
+		catch (InstantiationException e) {
+			e.printStackTrace();
 		}
-    	catch (IllegalAccessException e) {
-    		e.printStackTrace();
+		catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
-    	catch (IllegalArgumentException e) {
-    		e.printStackTrace();
+		catch (IllegalArgumentException e) {
+			e.printStackTrace();
 		}
-    	catch (InvocationTargetException e) {
-    		e.printStackTrace();
+		catch (InvocationTargetException e) {
+			e.printStackTrace();
 		}
-    	catch (NoSuchMethodException e) {
-    		e.printStackTrace();
+		catch (NoSuchMethodException e) {
+			e.printStackTrace();
 		}
-    	catch (SecurityException e) {
-    		e.printStackTrace();
+		catch (SecurityException e) {
+			e.printStackTrace();
 		}
     	
-    	return null;
-    }
+		return null;
+	}
 }
