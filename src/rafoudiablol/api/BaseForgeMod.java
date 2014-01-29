@@ -29,7 +29,7 @@ public abstract class BaseForgeMod
 	protected boolean doRegisterEvent = true;
 	protected boolean doRegisterRender = true;
 	
-	protected void preInit(BaseForgeProxy proxy)
+	protected final void preInit(BaseForgeProxy proxy)
 	{
 		// Entities, Event handlers
 		
@@ -40,7 +40,7 @@ public abstract class BaseForgeMod
 		}
 	}
 	
-	public void load(BaseForgeProxy proxy)
+	protected final void load(BaseForgeProxy proxy)
 	{
 		// Names, Renderers
 		
@@ -51,5 +51,8 @@ public abstract class BaseForgeMod
 		}
 	}
 	
+	// You can override these methods with the annotation @EventHandler
+	public void preInit(FMLPreInitializationEvent event) {}
+	public void load(FMLInitializationEvent event) {}
 	public void postInit(FMLPostInitializationEvent event) {}
 }
