@@ -3,6 +3,7 @@ package rafoudiablol.api;
 import java.lang.annotation.Inherited;
 
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -29,12 +30,13 @@ public abstract class BaseForgeMod
 	protected boolean doRegisterEvent = true;
 	protected boolean doRegisterRender = true;
 	
-	protected final void preInit(BaseForgeProxy proxy)
+	protected final void preInit(FMLPreInitializationEvent event, BaseForgeProxy proxy)
 	{
 		// Entities, Event handlers
 		
 		if(proxy != null)
 		{
+			proxy.preInit(event);
 			if(doRegisterEntity) proxy.registerEntity();
 			if(doRegisterEvent) proxy.registerEvent();
 		}
@@ -49,6 +51,11 @@ public abstract class BaseForgeMod
 			if(doRegisterItem) proxy.registerName();
 			if(doRegisterRender) proxy.registerRender();
 		}
+	}
+	
+	public final Mod getModAnnotation()
+	{
+		return (Mod)this.getClass().getAnnotation(Mod.class);
 	}
 	
 	// You can override these methods with the annotation @EventHandler

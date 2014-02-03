@@ -17,7 +17,7 @@ public class EnchantmentManager
      **/
 	
 	public boolean sendItemEventToEnchantments(ItemEvent event)
-    {
+	{
 		boolean somethingHappened = false;
 		final ItemStack stack = event.stack;
 	
@@ -33,9 +33,9 @@ public class EnchantmentManager
 		
 				if(enchantment instanceof IEnchantHandler)
 				{
-				    if(processEventToHandler(id, lvl, event, (IEnchantHandler) enchantment)) {
-					somethingHappened = true;
-				   }
+					if(processEventToHandler(id, lvl, event, (IEnchantHandler) enchantment)) {
+				    	somethingHappened = true;
+					}
 				}
 		    }
 		}
@@ -55,7 +55,7 @@ public class EnchantmentManager
 		}
 		else if(event instanceof ItemEvents.RightClick)
 		{
-		    return handler.handleRightClick(id, lvl, (ItemEvents.RightClick) event);
+			return handler.handleRightClick(id, lvl, (ItemEvents.RightClick) event);
 		}
 
 		// wtf ??

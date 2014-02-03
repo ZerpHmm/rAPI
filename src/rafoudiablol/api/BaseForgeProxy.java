@@ -1,10 +1,12 @@
 package rafoudiablol.api;
 
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class BaseForgeProxy
 {
+	public void preInit(FMLPreInitializationEvent event) {}
+	
 	public void registerName() {}
 	public void registerEntity() {}
 	public void registerEvent() {}
@@ -17,7 +19,7 @@ public class BaseForgeProxy
 	
 	public final Side getSide()
 	{
-		if(this instanceof IClientProxy) {
+		if(this instanceof IClientSide) {
 			return Side.CLIENT;
 		}
 		else {

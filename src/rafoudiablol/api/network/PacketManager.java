@@ -5,26 +5,77 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 
-public final class PacketManager
+/**
+ *	Packet I/O
+ *	La partie abstraite est pour l'impl�mentation des m�thodes processPacket(CustomPacketDataType, EntityPlayer)
+**/
+public abstract class PacketManager
+	implements IPacketHandler, IPacketDataSender, IPacketDataReceiver
 {
+	private final HashMap<Class<? extends PacketData>, Method> processHandleMethods = new HashMap();
 	private final HashMap<Class<? extends PacketData>, Integer> registeredData = new HashMap();
-	private Class<? extends PacketData>[] registeredID = new Class[255];
+	private final Class<? extends PacketData>[] registeredID = new Class[255];
 	public final String channel;
 	
-	public PacketManager(String channel) {
+	protected PacketManager(String channel) {
 		this.channel = channel;
+		initHandleMethods();
+	}
+
+	private void initHandleMethods()
+	{
+		Class<?> clazz = getClass();
+		
+		while(clazz != PacketManager.class)
+		{
+			System.out.println(clazz);
+			
+			for(Method method : clazz.getDeclaredMethods())
+			{
+				final int mod = method.getModifiers();
+				
+				if((Modifier.isPublic(mod) || Modifier.isProtected(mod)) && !Modifier.isStatic(mod) && !Modifier.isAbstract(mod)
+					&& method.getName().equals("processHandle"))
+				{
+					Class<?>[] parameters = method.getParameterTypes();
+					
+					if(parameters.length == 2 &&
+							PacketData.class.isAssignableFrom(parameters[0]) &&
+							EntityPlayer.class.isAssignableFrom(parameters[1]))
+					{
+						processHandleMethods.put((Class<? extends PacketData>)parameters[0], method);
+					}
+				}
+			}
+			
+			clazz = clazz.getSuperclass();
+		}
+	}
+	
+	/**
+	 *	IPacketHandler implementation
+	**/
+	@Override
+	public final void onPacketData(INetworkManager networkManager, Packet250CustomPayload packet, Player player)
+	{
+		this.receive(packet, player);
 	}
 	
 	/**
 	 * @param clazz
 	 */
-	
 	public void registerData(Class<? extends PacketData> clazz)
 	{
 		try
@@ -53,12 +104,12 @@ public final class PacketManager
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * @param data
 	 */
-	
-	public void sendToServer(PacketData data)
+	@Override
+	public void toServer(PacketData data)
 	{
 		final Packet250CustomPayload packet250 = new Packet250CustomPayload();
 		final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -95,8 +146,8 @@ public final class PacketManager
 	 * 	@param data
 	 * 	@param player
 	**/
-	
-	public void sendToPlayer(PacketData data, Player player)
+	@Override
+	public void toPlayer(PacketData data, EntityPlayer player)
 	{
 		final Packet250CustomPayload packet250 = new Packet250CustomPayload();
 		final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -112,7 +163,7 @@ public final class PacketManager
 			packet250.data = byteOut.toByteArray();
 			packet250.length = byteOut.size();
 			
-			PacketDispatcher.sendPacketToPlayer(packet250, player);
+			PacketDispatcher.sendPacketToPlayer(packet250, (Player)player);
 		}
 		catch(IOException e)
 		{
@@ -129,14 +180,10 @@ public final class PacketManager
 	}
 	
 	/**
-	 * 	Je ne sais pas s'il est possible d'envoyer un packet à tous les joueurs côté client
-	 * 	Mais même si c'est possible, ce n'est pas une bonne solution
-	 * 
 	 * 	@param data
-	 * 	@param playerSource
 	**/
-	
-	public void sendToAll(PacketData data)
+	@Override
+	public void toAll(PacketData data)
 	{
 		final Packet250CustomPayload packet250 = new Packet250CustomPayload();
 		final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -172,15 +219,17 @@ public final class PacketManager
 	 * 	@param packet
 	 * 	@param player
 	 */
-	
-	public PacketData receive(Packet250CustomPayload packet, Player player)
+	@Override
+	public final void receive(Packet250CustomPayload packet, Player player)
 	{
-		PacketData handler = null;
+		PacketData data = null;
 		
 		if(!packet.channel.equals(this.channel))
 		{
+			// wtf ?
+			
 			System.out.println(
-				String.format("[rafoudiablol] Bad packet channel: %s (it must be %s)", packet.channel, this.channel)
+				String.format("[rAPI] Bad packet channel: %s (it must be %s)", packet.channel, this.channel)
 			);
 		}
 		else
@@ -195,19 +244,26 @@ public final class PacketManager
 				final int packetID = in.readByte(); // packetID
 				final Class<? extends PacketData> clazz = registeredID[packetID];
 				
-				handler = clazz.newInstance();
-				handler.readData(in);
+				data = clazz.newInstance();
+				data.readData(in);
+				
+				this.processHandle(data, (EntityPlayer)player);
 			}
-			catch(IOException e)
+			catch(BadHandleException e)
 			{
+				System.out.println(
+					String.format("[rAPI] Bad PacketData process (channel '%s')", this.channel)
+				);
+				
 				e.printStackTrace();
 			}
-			catch (InstantiationException e)
-			{
+			catch(IOException e) {
 				e.printStackTrace();
 			}
-			catch (IllegalAccessException e)
-			{
+			catch (InstantiationException e) {
+				e.printStackTrace();
+			}
+			catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
 			finally
@@ -218,7 +274,35 @@ public final class PacketManager
 				catch(IOException e) {}
 			}
 		}
+	}
+
+	/**
+	 *	Handling process
+	**/
+	private void processHandle(PacketData data, EntityPlayer player)
+		throws BadHandleException
+	{
+		final Method m = processHandleMethods.get(data.getClass());
+
+		if(m == null)
+		{
+			throw new BadHandleException(
+				String.format("[rAPI] Cannot find %s.processHandle(%s)", this.getClass().getSimpleName(), data.getClass().getSimpleName())
+			);
+		}
 		
-		return handler;
+		try
+		{
+			m.invoke(this, data, player);
+		}
+		catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+		catch (IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+		catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -8,4 +8,6 @@ public class RApi
 	public static final int MINOR = 0;
 	public static final String VERSION = MAJOR + "." + MINOR;
 	public static final String DEPENDENCY = "required-after:" + MODID;
+	
+	public static final String MODS_DATA_DIR = "mods-data";
 }

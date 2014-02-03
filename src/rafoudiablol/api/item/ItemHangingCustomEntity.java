@@ -1,4 +1,4 @@
-package rafoudiablol.api.network;
+package rafoudiablol.api.item;
 
 import java.lang.reflect.InvocationTargetException;
 

@@ -8,13 +8,13 @@ import java.io.IOException;
 
 public abstract class PacketData
 {
-	public PacketData() {
-		// trivial constructor obligatory
+	protected PacketData()
+	{
 	}
-	
-	public abstract void readData(DataInput in) throws IOException;
-	public abstract void writeData(DataOutput out) throws IOException;
 	
 	public abstract String getDataName();
 	public abstract int getDataID();
+	
+	public abstract void readData(DataInput in) throws IOException;
+	public abstract void writeData(DataOutput out) throws IOException;
 }

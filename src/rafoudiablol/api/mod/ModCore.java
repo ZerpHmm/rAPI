@@ -18,8 +18,8 @@ public class ModCore extends BaseForgeMod
 {
 	@SidedProxy(
 		clientSide = "rafoudiablol.api.mod.client.ClientProxy",
-		serverSide = "rafoudiablol.api.mod.Proxy"
-	) public static Proxy proxy;
+		serverSide = "rafoudiablol.api.mod.ModProxy"
+	) public static ModProxy proxy;
 	
 	@Instance(
 		value = RApi.MODID
@@ -28,7 +28,7 @@ public class ModCore extends BaseForgeMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		super.preInit(proxy);
+		super.preInit(event, proxy);
 		proxy.registerPackChangedEvent();
 	}
 	
