@@ -3,8 +3,6 @@ package rafoudiablol.api.client;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.tree.DefaultTreeCellEditor.DefaultTextField;
-
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -94,7 +92,7 @@ public class GuiScreenTextField extends GuiScreen
 	    this.sizeY = 12;
     
         Keyboard.enableRepeatEvents(true);
-        inputGui = new GuiTextField(this.fontRenderer, posX, posY, sizeX, sizeY);
+        inputGui = new GuiTextField(this.fontRendererObj, posX, posY, sizeX, sizeY);
         inputGui.setEnableBackgroundDrawing(false);
         inputGui.setFocused(true);
         inputGui.setMaxStringLength(getMaxFieldLength());

@@ -3,6 +3,7 @@ package rafoudiablol.api.client;
 import java.io.File;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.WorldServer;
 import rafoudiablol.api.BaseForgeMod;
 import rafoudiablol.api.RApi;
@@ -26,7 +27,7 @@ public class MinecraftClient
 	 *	Add client chat message
 	**/
 	public static void chat(String msg) {
-		mc.thePlayer.addChatMessage(msg);
+		mc.thePlayer.addChatMessage(new ChatComponentText(msg));
 	}
 	
 	public static boolean singleplayer()

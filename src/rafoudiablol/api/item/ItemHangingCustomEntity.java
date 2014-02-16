@@ -2,19 +2,12 @@ package rafoudiablol.api.item;
 
 import java.lang.reflect.InvocationTargetException;
 
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import rafoudiablol.cp.Identifier;
-import rafoudiablol.cp.ModCore;
-import rafoudiablol.cp.common.EntityCustomPainting;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.Direction;
 import net.minecraft.world.World;
 
@@ -27,9 +20,8 @@ public class ItemHangingCustomEntity extends Item
 {
     private final Class hangingEntityClass;
 
-    public ItemHangingCustomEntity(int i, Class clazz)
+    public ItemHangingCustomEntity(Class<? extends Entity> clazz)
     {
-        super(i);
         this.hangingEntityClass = clazz;
     }
 
@@ -52,25 +44,24 @@ public class ItemHangingCustomEntity extends Item
         else
         {
             int i1 = Direction.facingToDirection[l];
-            EntityHanging entityhanging = this.createHangingEntity(world, i, j, k, i1);
+            Entity entity = this.createHangingEntity(world, i, j, k, i1);
             
-            if (!entityplayer.canPlayerEdit(i, j, k, l, itemstack))
+            if(!entityplayer.canPlayerEdit(i, j, k, l, itemstack))
             {
                 return false;
             }
             else
             {
-                if (entityhanging != null && entityhanging.onValidSurface())
+                if(entity != null)
                 {
-                	this.preSpawn(world, entityplayer, i, j, k, entityhanging);
+                	this.preSpawn(world, entityplayer, i, j, k, entity);
                 	
-                    if (!world.isRemote)
+                    if(!world.isRemote)
                     {
-                		world.spawnEntityInWorld(entityhanging);
-                		
+                		world.spawnEntityInWorld(entity);
                     }
                     
-                    this.postSpawn(world, entityplayer, i, j, k, entityhanging);
+                    this.postSpawn(world, entityplayer, i, j, k, entity);
 
                     --itemstack.stackSize;
                 }
@@ -80,17 +71,17 @@ public class ItemHangingCustomEntity extends Item
         }
     }
     
-    protected void preSpawn(World world, EntityPlayer entityplayer, int i, int j, int k, EntityHanging entity)  {}
-    protected void postSpawn(World world, EntityPlayer entityplayer, int i, int j, int k, EntityHanging entity)  {}
+    protected void preSpawn(World world, EntityPlayer entityplayer, int i, int j, int k, Entity entity)  {}
+    protected void postSpawn(World world, EntityPlayer entityplayer, int i, int j, int k, Entity entity)  {}
     
     /**
      * Create the hanging entity associated to this item.
      */
-    private EntityHanging createHangingEntity(World world, int i, int j, int k, int l)
+    private Entity createHangingEntity(World world, int i, int j, int k, int l)
     {
     	try
 		{
-			return (EntityHanging)hangingEntityClass
+			return (Entity)hangingEntityClass
 				.getConstructor(World.class, int.class, int.class, int.class, int.class)
 					.newInstance(world, i, j, k, l);
 		}

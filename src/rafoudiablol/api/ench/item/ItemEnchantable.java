@@ -12,16 +12,14 @@ public class ItemEnchantable extends Item
 {
 	protected final EnchantmentManager manager;
 	
-	public ItemEnchantable(int i)
+	public ItemEnchantable()
 	{
-		super(i);
 		this.setMaxStackSize(1);
 		this.manager = new EnchantmentManager();
 	}
 	
-	public ItemEnchantable(int i, EnchantmentManager manager)
+	public ItemEnchantable(EnchantmentManager manager)
 	{
-		super(i);
 		this.setMaxStackSize(1);
 		this.manager = manager;
 	}
