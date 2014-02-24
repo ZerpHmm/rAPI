@@ -1,5 +1,6 @@
 package rafoudiablol.api.ench.item;
 
+import cpw.mods.fml.common.eventhandler.Event;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -12,16 +13,15 @@ public class ItemEnchantable extends Item
 {
 	protected final EnchantmentManager manager;
 	
-	public ItemEnchantable()
-	{
-		this.setMaxStackSize(1);
-		this.manager = new EnchantmentManager();
-	}
-	
 	public ItemEnchantable(EnchantmentManager manager)
 	{
 		this.setMaxStackSize(1);
 		this.manager = manager;
+	}
+	
+	public ItemEnchantable()
+	{
+		this(new EnchantmentManager());
 	}
     
 	/**

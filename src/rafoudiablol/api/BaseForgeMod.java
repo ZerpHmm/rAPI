@@ -2,10 +2,14 @@ package rafoudiablol.api;
 
 import java.io.File;
 
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+
 import org.apache.logging.log4j.Logger;
 
 import rafoudiablol.api.network.IPacketManager;
 import rafoudiablol.api.network.PacketPipeline;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -38,15 +42,20 @@ public abstract class BaseForgeMod
 	protected boolean shouldRegisterBlocks = true;
 	protected boolean shouldRegisterEntities = true;
 	protected boolean shouldRegisterRenderers = true;
+	protected boolean shouldRegisterRecipes = true;
+	protected boolean shouldRegisterKeyBindings = true;
+	private final boolean isProxyFMLEventHandler;
+	private final boolean isProxyForgeEventHandler;
 	protected final BaseForgeProxy proxyObj;
-	private final PacketPipeline packetPipeline = new PacketPipeline();
+	private final PacketPipeline packetPipeline = new PacketPipeline(this);
+	private Configuration configuration = null;
 	private Logger loggerObj = null;
-	private File modDirObj = null;
-	private File confFileObj = null;
 	
 	public BaseForgeMod(BaseForgeProxy proxy)
 	{
 		proxyObj = proxy;
+		isProxyFMLEventHandler = (proxyObj instanceof IFMLEventHandler);
+		isProxyForgeEventHandler = (proxyObj instanceof IForgeEventHandler);
 	}
 	
 	public BaseForgeMod()
@@ -56,7 +65,7 @@ public abstract class BaseForgeMod
 	
 	public final Mod getModAnnotation()
 	{
-		return (Mod)this.getClass().getAnnotation(Mod.class);
+		return this.getClass().getAnnotation(Mod.class);
 	}
 	
 	public final Logger getLogger()
@@ -64,14 +73,9 @@ public abstract class BaseForgeMod
 		return loggerObj;
 	}
 	
-	public final File getDirectory()
+	public final Configuration getConfiguration()
 	{
-		return modDirObj;
-	}
-	
-	public final File getConfFile()
-	{
-		return confFileObj;
+		return configuration;
 	}
 
 	public final IPacketManager getPacketManager()
@@ -86,15 +90,32 @@ public abstract class BaseForgeMod
 	protected void pre(FMLPreInitializationEvent event)
 	{
 		loggerObj = event.getModLog();
-		modDirObj = event.getModConfigurationDirectory();
-		confFileObj = event.getSuggestedConfigurationFile();
 		
+		configuration = new Configuration(event.getSuggestedConfigurationFile());
+		configuration.load();
+
+		packetPipeline.initalize();
 		
 		if(proxyObj != null)
 		{
-			if(shouldRegisterBlocks) proxyObj.registerBlocks();
-			if(shouldRegisterItems) proxyObj.registerItems();
-			if(shouldRegisterEntities) proxyObj.registerEntities();
+			getLogger().debug("Pre initialization...");
+			proxyObj.pre(this);
+			
+			if(shouldRegisterBlocks)
+			{
+				getLogger().debug("Registering blocks...");
+				proxyObj.registerBlocks(this);
+			}
+			if(shouldRegisterItems)
+			{
+				getLogger().debug("Registering items...");
+				proxyObj.registerItems(this);
+			}
+			if(shouldRegisterEntities)
+			{
+				getLogger().debug("Registering entities...");
+				proxyObj.registerEntities(this);
+			}
 		}
 	}
 
@@ -104,12 +125,19 @@ public abstract class BaseForgeMod
 	**/
 	
 	protected void init(FMLInitializationEvent event)
-	{
-		packetPipeline.initalize();
-		
+	{		
 		if(proxyObj != null)
 		{
-			if(shouldRegisterRenderers) proxyObj.registerRenderers();
+			if(shouldRegisterRenderers)
+			{
+				getLogger().debug("Registering renderers...");
+				proxyObj.registerRenderers(this);
+			}
+			if(shouldRegisterRecipes)
+			{
+				getLogger().debug("Registering recipes...");
+				proxyObj.registerRecipes(this);
+			}
 		}
 	}
 
@@ -121,5 +149,23 @@ public abstract class BaseForgeMod
 	protected void post(FMLPostInitializationEvent event)
 	{
 		packetPipeline.postInitialize();
+		
+		if(proxyObj != null)
+		{
+			if(shouldRegisterKeyBindings)
+			{
+				getLogger().debug("Registering key bindings...");
+				proxyObj.registerKeyBindings(this);
+			}
+		}
+		
+		if(isProxyFMLEventHandler)
+		{
+			FMLCommonHandler.instance().bus().register(proxyObj);
+		}
+		if(isProxyForgeEventHandler)
+		{
+			MinecraftForge.EVENT_BUS.register(proxyObj);
+		}
 	}
 }

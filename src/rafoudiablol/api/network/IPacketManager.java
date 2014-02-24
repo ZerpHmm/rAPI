@@ -1,5 +1,6 @@
 package rafoudiablol.api.network;
 
+import rafoudiablol.api.packet.AbstractPacket;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import net.minecraft.entity.player.EntityPlayerMP;
 

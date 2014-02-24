@@ -5,19 +5,31 @@ import cpw.mods.fml.relauncher.Side;
 
 public class BaseForgeProxy
 {
-	public void registerBlocks()
+	public void pre(BaseForgeMod mod)
 	{
 	}
 	
-	public void registerItems()
+	public void registerBlocks(BaseForgeMod mod)
 	{
 	}
 	
-	public void registerRenderers()
+	public void registerItems(BaseForgeMod mod)
 	{
 	}
 	
-	public void registerEntities()
+	public void registerRecipes(BaseForgeMod mod)
+	{
+	}
+	
+	public void registerEntities(BaseForgeMod mod)
+	{
+	}
+	
+	public void registerRenderers(BaseForgeMod mod)
+	{
+	}
+	
+	public void registerKeyBindings(BaseForgeMod mod)
 	{
 	}
 }

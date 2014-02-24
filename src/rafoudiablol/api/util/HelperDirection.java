@@ -1,6 +1,6 @@
-package rafoudiablol.api;
+package rafoudiablol.api.util;
 
-public interface CompassHelper
+public interface HelperDirection
 {
 	/**
 	 *	Directions (2D)
