@@ -14,8 +14,8 @@ public class RApiServer
 	}
 
 	/**
-	 *	return an instance of EntityPlayer of the given name,
-	 *	or null if the player si not found
+	 *	return an instance of EntityPlayer of the given name
+	 *	or null if the player is not found
 	 *	WORKS ON CLIENT SIDE
 	**/
 	public static EntityPlayerMP getPlayerByName(String name)
